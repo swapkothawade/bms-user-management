@@ -6,6 +6,8 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -16,12 +18,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RefreshScope
 public class JwtTokenProvider {
     private static final String AUTH="auth";
     private static final String AUTHORIZATION="Authorization";
-    private String secretKey="secret-key";
-    private long validityInMilliseconds = 3600000; // 1h
-
+    @Value("${security.jwt.token.secret-key}")
+    private String secretKey;
+//    private String secretKey="secret-key";
+//    private long validityInMilliseconds = 3600000; // 1h
+    @Value("${security.jwt.token.expire-length}")
+    private long validityInMilliseconds;
 
 
     @PostConstruct
