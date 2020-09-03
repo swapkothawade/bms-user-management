@@ -1,14 +1,14 @@
 package com.mybank.api.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.LocalDate;
+import java.util.Set;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import java.time.LocalDate;
-import java.util.Set;
+
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Document
@@ -26,7 +26,6 @@ public class UserProfile {
         @Email
         private String email;
 
-        @JsonIgnore
         @NotEmpty(message = "Please provide Password")
         private String password;
 

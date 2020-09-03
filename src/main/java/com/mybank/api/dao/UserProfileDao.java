@@ -1,18 +1,13 @@
+
 package com.mybank.api.dao;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoException;
-import com.mongodb.MongoWriteException;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mybank.api.auth.User;
-import com.mybank.api.domain.UserProfile;
+import static com.mongodb.client.model.Filters.eq;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-import com.mybank.api.exception.CustomException;
-import org.bson.BsonDocument;
-import org.bson.Document;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
@@ -24,12 +19,16 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import static com.mongodb.client.model.Filters.eq;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoException;
+import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mybank.api.auth.User;
+import com.mybank.api.domain.UserProfile;
+import com.mybank.api.exception.CustomException;
 
 @Component
 @RefreshScope
@@ -65,14 +64,17 @@ public class UserProfileDao extends AbstractBMSDao {
      * @return
      */
     public boolean addUser(UserProfile userProfile) {
-        try {
+    	log.info("Adding Profile foe User {} " , userProfile.getFirstName());
+    	try {
             userProfileCollection.insertOne(userProfile);
             loginCollection.insertOne(getUser(userProfile));
+            log.info("Profile created for  User {} " , userProfile.getFirstName());
             return true;
         }catch(MongoWriteException exception){
-                throw new CustomException(exception.getMessage(), HttpStatus.BAD_REQUEST);
+            log.error(exception.getMessage());   
+        	throw new CustomException(exception.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
+    	
     }
 
     private User getUser(UserProfile userProfile) {
@@ -81,6 +83,7 @@ public class UserProfileDao extends AbstractBMSDao {
         user.setPassword(userProfile.getPassword());
         user.setName(userProfile.getFirstName());
         user.setLastname(userProfile.getLastName());
+        user.setPassword(userProfile.getPassword());
         Set<String> roles = new HashSet<>();
         roles.add("USER");
         user.setRole(roles);
